@@ -27,7 +27,7 @@ if ( defined( 'ABSPATH' ) ) {
 		if ( time() - filectime( $lock ) > ALERT_INTERVAL ) {
 			unlink( $lock );
 		}
-	} else {
+	} elseif ( $touched = touch( $lock ) ) {
 		$headers  = 'From: ' . MAIL_FROM . "\n" .
 			'X-Mailer: PHP/' . PHP_VERSION . "\n" .
 			'X-Priority: 1 (High)';
@@ -40,7 +40,6 @@ if ( defined( 'ABSPATH' ) ) {
 			. $full_url . "\n";
 		$subject  = 'Database error at ' . $server_name;
 		mail( MAIL_TO, $subject, $message, $headers );
-		$touched = touch( $lock );
 	}
 }
 ?>
