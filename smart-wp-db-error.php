@@ -3,7 +3,7 @@
  * Smart WP db-error.php
  *
  * @package Smart_WP_db_error_php
- * @version 1.0.0
+ * @version 1.0.1
  *
  * @copyright 2017-8 Alexandros Kozak
  * @license GPLv2 (or later)
