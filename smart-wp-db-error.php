@@ -31,12 +31,14 @@ if ( defined( 'ABSPATH' ) ) {
 		$headers  = 'From: ' . MAIL_FROM . "\n" .
 			'X-Mailer: PHP/' . PHP_VERSION . "\n" .
 			'X-Priority: 1 (High)';
-		$protocol = isset( $_SERVER['HTTPS'] ) ? 'https' : 'http';
-		$message  = 'Database Error on ' . $_SERVER['SERVER_NAME'] . "\n" .
+		$protocol = is_ssl() ? 'https' : 'http';
+		$server_name = filter_var( $_SERVER['SERVER_NAME'], FILTER_SANITIZE_URL );
+		$full_url = $protocol . '://' . $server_name
+			. filter_var( $_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL );
+		$message  = 'Database Error on ' . $server_name . "\n" .
 			'The database error occurred when someone tried to open this page: '
-			. $protocol . '://' . $_SERVER['SERVER_NAME']
-			. $_SERVER['REQUEST_URI'] . "\n";
-		$subject  = 'Database error at ' . $_SERVER['SERVER_NAME'];
+			. $full_url . "\n";
+		$subject  = 'Database error at ' . $server_name;
 		mail( MAIL_TO, $subject, $message, $headers );
 		$touched = touch( $lock );
 	}
