@@ -1,0 +1,16 @@
+<?php
+/**
+ * Smart WP db-error.php Configuration FIle
+ *
+ * @package Smart_WP_db_error_php
+ */
+
+define( 'MAIL_TO', 'Firstname Lastname <example@example.com>' );
+define( 'MAIL_FROM', 'example@website.com' );
+define( 'ALERT_INTERVAL', 300 );        // In seconds.
+define( 'SUPPRESS_CREDITS', FALSE )
+
+require __DIR__ . DIRECTORY_SEPARATOR . 'smart-wp-db-error' . DIRECTORY_SEPARATOR . 'smart-wp-db-error.php';
+
+// @codingStandardsIgnoreLine
+// vim: ft=php:ts=4:sts=4:sw=4:noet
