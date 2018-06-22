@@ -6,6 +6,6 @@
 	</rule>
 	<rule ref="WordPress-Extra">
 	</rule>
-	<rule ref="PHPCompatiblity">
+	<rule ref="PHPCompatibility">
 	</rule>
 </ruleset>
