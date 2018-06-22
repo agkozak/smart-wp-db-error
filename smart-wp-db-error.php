@@ -27,18 +27,27 @@ if ( defined( 'ABSPATH' ) ) {
 		if ( time() - filectime( $lock ) > ALERT_INTERVAL ) {
 			unlink( $lock );
 		}
-	} elseif ( $touched = touch( $lock ) ) {
+	} elseif ( touch( $lock ) ) {
+		$touched  = true;
 		$headers  = 'From: ' . MAIL_FROM . "\n" .
 			'X-Mailer: PHP/' . PHP_VERSION . "\n" .
 			'X-Priority: 1 (High)';
 		$protocol = is_ssl() ? 'https' : 'http';
-		$server_name = filter_var( $_SERVER['SERVER_NAME'], FILTER_SANITIZE_URL );
-		$full_url = $protocol . '://' . $server_name
-			. filter_var( $_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL );
-		$message  = 'Database Error on ' . $server_name . "\n" .
+		if ( isset( $_SERVER['SERVER_NAME'] ) ) {             // Input var okay.
+			$server_name = filter_var( wp_unslash(
+				$_SERVER['SERVER_NAME'], FILTER_SANITIZE_URL  // Input var okay.
+			) );
+		}
+		if ( isset( $_SERVER['REQUEST_URI'] ) ) {             // Input var okay.
+			$full_url = $protocol . '://' . $server_name
+				. filter_var( wp_unslash(
+					$_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL // Input var okay.
+				) );
+		}
+		$message = 'Database Error on ' . $server_name . "\n" .
 			'The database error occurred when someone tried to open this page: '
 			. $full_url . "\n";
-		$subject  = 'Database error at ' . $server_name;
+		$subject = 'Database error at ' . $server_name;
 		mail( MAIL_TO, $subject, $message, $headers );
 	}
 }
