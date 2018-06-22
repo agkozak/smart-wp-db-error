@@ -9,6 +9,7 @@
  * @license GPLv2 (or later)
  */
 
+// Die silently if smart-wp-db-error.php has been accessed directly.
 if ( ! defined( 'MAIL_FROM' )
 	|| ! defined( 'MAIL_TO' )
 	|| ! defined( 'ALERT_INTERVAL' ) ) {
@@ -20,6 +21,7 @@ header( 'Status: 503 Service Temporarily Unavailable' );
 header( 'Retry-After: 600' );
 $touched = false;
 $lock    = __DIR__ . DIRECTORY_SEPARATOR . 'smart-wp-db-error.lock';
+// Never send e-mail when db-error.php is accessed directly.
 if ( defined( 'ABSPATH' ) ) {
 	if ( file_exists( $lock ) ) {
 		if ( time() - filectime( $lock ) > ALERT_INTERVAL ) {
