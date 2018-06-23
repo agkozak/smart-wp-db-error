@@ -3,7 +3,7 @@
  * Smart WP db-error.php
  *
  * @package Smart_WP_db_error_php
- * @version 1.0.2
+ * @version 1.0.3
  *
  * @copyright 2017-2018 Alexandros Kozak
  * @license GPLv2 (or later)
@@ -34,15 +34,17 @@ if ( defined( 'ABSPATH' ) ) {
 			'X-Priority: 1 (High)';
 		$protocol = is_ssl() ? 'https' : 'http';
 		if ( isset( $_SERVER['SERVER_NAME'] ) ) {             // Input var okay.
-			$server_name = filter_var( wp_unslash(
-				$_SERVER['SERVER_NAME'], FILTER_SANITIZE_URL  // Input var okay.
-			) );
+			$server_name = filter_var(
+				wp_unslash( $_SERVER['SERVER_NAME'] ),        // Input var okay.
+				FILTER_SANITIZE_URL
+			);
 		}
 		if ( isset( $_SERVER['REQUEST_URI'] ) ) {             // Input var okay.
 			$full_url = $protocol . '://' . $server_name
-				. filter_var( wp_unslash(
-					$_SERVER['REQUEST_URI'], FILTER_SANITIZE_URL // Input var okay.
-				) );
+				. filter_var(
+					wp_unslash( $_SERVER['REQUEST_URI'] ),    // Input var okay.
+					FILTER_SANITIZE_URL
+				);
 		}
 		$message = 'Database Error on ' . $server_name . "\n" .
 			'The database error occurred when someone tried to open this page: '
