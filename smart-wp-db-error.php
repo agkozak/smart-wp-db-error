@@ -38,6 +38,8 @@ if ( defined( 'ABSPATH' ) ) {
 				wp_unslash( $_SERVER['SERVER_NAME'] ),        // Input var okay.
 				FILTER_SANITIZE_URL
 			);
+		} else {
+			$server_name = '';
 		}
 		if ( isset( $_SERVER['REQUEST_URI'] ) ) {             // Input var okay.
 			$full_url = $protocol . '://' . $server_name
@@ -45,6 +47,8 @@ if ( defined( 'ABSPATH' ) ) {
 					wp_unslash( $_SERVER['REQUEST_URI'] ),    // Input var okay.
 					FILTER_SANITIZE_URL
 				);
+		} else {
+			$full_url = '';
 		}
 		$message = 'Database Error on ' . $server_name . "\n" .
 			'The database error occurred when someone tried to open this page: '
