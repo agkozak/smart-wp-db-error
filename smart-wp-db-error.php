@@ -16,7 +16,13 @@ if ( ! defined( 'MAIL_FROM' )
 	die();
 }
 
-header( 'HTTP/1.1 503 Service Temporarily Unavailable' );
+if ( isset( $_SERVER['SERVER_PROTOCOL'] ) ) {
+    $server_protocol = $_SERVER['SERVER_PROTOCOL'];
+} else {
+    $server_protocol = 'HTTP/1.1';
+}
+
+header( $server_protocol . ' 503 Service Temporarily Unavailable' );
 header( 'Status: 503 Service Temporarily Unavailable' );
 header( 'Retry-After: 600' );
 $touched = false;
