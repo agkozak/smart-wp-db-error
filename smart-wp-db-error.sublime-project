@@ -1,0 +1,9 @@
+{
+    "SublimeLinter": {
+        "linters": {
+            "phpcs": {
+                "standard": "${folder}/phpcs.xml.dist"
+            }
+        }
+    }
+}

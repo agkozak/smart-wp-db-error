@@ -17,9 +17,9 @@ if ( ! defined( 'MAIL_FROM' )
 }
 
 if ( isset( $_SERVER['SERVER_PROTOCOL'] ) ) {
-    $server_protocol = $_SERVER['SERVER_PROTOCOL'];
+	$server_protocol = $_SERVER['SERVER_PROTOCOL'];
 } else {
-    $server_protocol = 'HTTP/1.1';
+	$server_protocol = 'HTTP/1.1';
 }
 
 header( $server_protocol . ' 503 Service Temporarily Unavailable' );
