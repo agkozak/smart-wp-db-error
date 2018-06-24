@@ -28,12 +28,16 @@ header( 'Status: 503 Service Temporarily Unavailable' );
 header( 'Retry-After: 600' );
 $touched = false;
 $lock    = __DIR__ . DIRECTORY_SEPARATOR . 'smart-wp-db-error.lock';
-// Never send e-mail when db-error.php is accessed directly.
+// When db-error.php is accessed directly, only show the message; do not e-mail.
 if ( defined( 'ABSPATH' ) ) {
+
+    // If lock exists and is older than the alert interval, delete it.
 	if ( file_exists( $lock ) ) {
 		if ( time() - filectime( $lock ) > ALERT_INTERVAL ) {
 			unlink( $lock );
 		}
+
+	// Otherwise try to create the lock; if successful, send the alert e-mail.
 	} elseif ( touch( $lock ) ) {
 		$touched  = true;
 		$headers  = 'From: ' . MAIL_FROM . "\n" .
