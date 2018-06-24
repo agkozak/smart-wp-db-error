@@ -16,9 +16,12 @@ if ( ! defined( 'MAIL_FROM' )
 	die();
 }
 
-$server_protocol = isset( $_SERVER['SERVER_PROTOCOL'] )
-    ? $_SERVER['SERVER_PROTOCOL']
-    : 'HTTP/1.1';
+// Information protocol of incoming request.
+if ( isset( $_SERVER['SERVER_PROTOCOL'] ) ) {
+    $server_protocol = $_SERVER['SERVER_PROTOCOL'];
+} else {
+	$server_protocol = 'HTTP/1.1';
+}
 
 header( $server_protocol . ' 503 Service Temporarily Unavailable' );
 header( 'Status: 503 Service Temporarily Unavailable' );
@@ -36,24 +39,26 @@ if ( defined( 'ABSPATH' ) ) {
 		$headers  = 'From: ' . MAIL_FROM . "\n" .
 			'X-Mailer: PHP/' . PHP_VERSION . "\n" .
 			'X-Priority: 1 (High)';
-		$protocol = isset( $_SERVER['HTTPS'] ) ? 'https' : 'http';
-		if ( isset( $_SERVER['SERVER_NAME'] ) ) {             // Input var okay.
-			$server_name = filter_var(
-				stripslashes( $_SERVER['SERVER_NAME'] ),        // Input var okay.
-				FILTER_SANITIZE_URL
-			);
-		} else {
-			$server_name = '';
-		}
-		if ( isset( $_SERVER['REQUEST_URI'] ) ) {             // Input var okay.
-			$full_url = $protocol . '://' . $server_name
-				. filter_var(
-					stripslashes( $_SERVER['REQUEST_URI'] ),    // Input var okay.
-					FILTER_SANITIZE_URL
-				);
-		} else {
-			$full_url = '';
-		}
+
+		// Encrypted vs. non-encrypted connection.
+		if ( ! empty( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] !== 'off' ) {
+		    $web_protocol = 'https';
+        } else {
+		    $web_protocol = 'http';
+        }
+
+		$server_name = isset( $_SERVER['SERVER_NAME'] )
+            ? filter_var( stripslashes(
+                    $_SERVER['SERVER_NAME']                   // Input var okay.
+            ), FILTER_SANITIZE_URL )
+            : '';
+
+		$full_url = isset( $_SERVER['REQUEST_URI'] )
+            ? $web_protocol . '://' . $server_name . filter_var ( stripslashes (
+				$_SERVER['REQUEST_URI']                       // Input var okay.
+            ), FILTER_SANITIZE_URL )
+            : '';
+
 		$message = 'Database Error on ' . $server_name . "\n" .
 			'The database error occurred when someone tried to open this page: '
 			. $full_url . "\n";
