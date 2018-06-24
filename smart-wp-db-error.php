@@ -47,21 +47,28 @@ if ( defined( 'ABSPATH' ) ) {
 		    $web_protocol = 'http';
         }
 
-		$server_name = isset( $_SERVER['SERVER_NAME'] )
-            ? filter_var( stripslashes(
-                    $_SERVER['SERVER_NAME']                   // Input var okay.
-            ), FILTER_SANITIZE_URL )
-            : '';
+        // Server name.
+        if ( isset( $_SERVER['SERVER_NAME'] ) ) {
+		    $server_name = filter_var( stripslashes(
+		            $_SERVER['SERVER_NAME']                   // Input var okay.
+            ), FILTER_SANITIZE_URL );
+        } else {
+		    $server_name = '';
+        }
 
-		$full_url = isset( $_SERVER['REQUEST_URI'] )
-            ? $web_protocol . '://' . $server_name . filter_var ( stripslashes (
-				$_SERVER['REQUEST_URI']                       // Input var okay.
-            ), FILTER_SANITIZE_URL )
-            : '';
+        // Request URI.
+        if ( isset( $_SERVER['REQUEST_URI'] ) ) {
+		    $request_uri = filter_var( stripslashes(
+		            $_SERVER['REQUEST_URI']
+            ), FILTER_SANITIZE_URL );                    // Input var okay.
+        } else {
+		    $request_uri = '';
+        }
 
+        // The e-mail alert.
 		$message = 'Database Error on ' . $server_name . "\n" .
 			'The database error occurred when someone tried to open this page: '
-			. $full_url . "\n";
+			. $web_protocol . '://' . $server_name . $request_uri . "\n";
 		$subject = 'Database error at ' . $server_name;
 		mail( MAIL_TO, $subject, $message, $headers );
 	}
