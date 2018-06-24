@@ -32,10 +32,10 @@ if ( defined( 'ABSPATH' ) ) {
 		$headers  = 'From: ' . MAIL_FROM . "\n" .
 			'X-Mailer: PHP/' . PHP_VERSION . "\n" .
 			'X-Priority: 1 (High)';
-		$protocol = is_ssl() ? 'https' : 'http';
+		$protocol = isset( $_SERVER['HTTPS'] ) ? 'https' : 'http';
 		if ( isset( $_SERVER['SERVER_NAME'] ) ) {             // Input var okay.
 			$server_name = filter_var(
-				wp_unslash( $_SERVER['SERVER_NAME'] ),        // Input var okay.
+				stripslashes( $_SERVER['SERVER_NAME'] ),        // Input var okay.
 				FILTER_SANITIZE_URL
 			);
 		} else {
@@ -44,7 +44,7 @@ if ( defined( 'ABSPATH' ) ) {
 		if ( isset( $_SERVER['REQUEST_URI'] ) ) {             // Input var okay.
 			$full_url = $protocol . '://' . $server_name
 				. filter_var(
-					wp_unslash( $_SERVER['REQUEST_URI'] ),    // Input var okay.
+					stripslashes( $_SERVER['REQUEST_URI'] ),    // Input var okay.
 					FILTER_SANITIZE_URL
 				);
 		} else {
