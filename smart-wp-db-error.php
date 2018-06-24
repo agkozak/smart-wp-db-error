@@ -3,7 +3,7 @@
  * Smart WP db-error.php
  *
  * @package Smart_WP_db_error_php
- * @version 1.0.4
+ * @version 1.0.5
  *
  * @copyright 2017-2018 Alexandros Kozak
  * @license GPLv2 (or later)
@@ -63,9 +63,9 @@ if ( defined( 'ABSPATH' ) ) {
         // Request URI.
         if ( isset( $_SERVER['REQUEST_URI'] ) ) {
 		    $request_uri = filter_var( stripslashes(
-		            $_SERVER['REQUEST_URI']
-            ), FILTER_SANITIZE_URL );                    // Input var okay.
-        } else {
+		            $_SERVER['REQUEST_URI']                   // Input var okay.
+				), FILTER_SANITIZE_URL );
+		} else {
 		    $request_uri = '';
         }
 
