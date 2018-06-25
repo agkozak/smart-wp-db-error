@@ -132,11 +132,7 @@ if ( defined( 'ABSPATH' ) ) {
 			<div id="error">
 				<h1>Database Error</h1>
 				<p>Sorry for the inconvenience.  Check back later.</p>
-				<?php
-				if ( true === $touched
-					|| ( file_exists( $lock )
-					&& time() - filectime( $lock ) <= ALERT_INTERVAL ) ) :
-				?>
+				<?php if ( true === $touched || ( file_exists( $lock ) && time() - filectime( $lock ) <= ALERT_INTERVAL ) ) : ?>
 				<p>Administrator alerted.</p>
 				<?php endif; ?>
 			</div>
