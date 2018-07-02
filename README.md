@@ -20,18 +20,22 @@ WordPress allows us to address this problem in the following way: if it cannot c
 
 To install Smart WP db-error.php, execute the following:
 
-    cd /path/to/wp-content
-    git clone https://github.com/agkozak/smart-wp-db-error.git
-    cd smart-wp-db-error
-    cp db-error.php.dist ../db-error.php
-    cd ..
+```sh
+cd /path/to/wp-content
+git clone https://github.com/agkozak/smart-wp-db-error.git
+cd smart-wp-db-error
+cp db-error.php.dist ../db-error.php
+cd ..
+```
 
 At this point it is vitally necessary that you edit the new `/wp-content/db-error.php` file so as to include installation-specific information. The defaults are
 
-    define( 'MAIL_TO', 'Firstname Lastname <example@example.com>' );
-    define( 'MAIL_FROM', 'example@website.com' );
-    define( 'ALERT_INTERVAL', 300 );        // In seconds.
-	define( 'SUPPRESS_CREDITS', false );
+```php
+define( 'MAIL_TO', 'Firstname Lastname <example@example.com>' );
+define( 'MAIL_FROM', 'example@website.com' );
+define( 'ALERT_INTERVAL', 300 );        // In seconds.
+define( 'SUPPRESS_CREDITS', false );
+```
 
 `MAIL_TO` and `MAIL_FROM` should be addresses chosen to cause the least trouble for spam filters (e-mail sent by PHP from a webserver is likely to need whitelisting). `ALERT_INTERVAL` is the number of seconds between attempts at mailing the webmaster.
 
