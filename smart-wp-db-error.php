@@ -16,6 +16,11 @@ if ( ! defined( 'MAIL_FROM' )
 	die();
 }
 
+// SUPPRESS_CREDITS is optional; default it so line 139 cannot fatal on PHP 8+.
+if ( ! defined( 'SUPPRESS_CREDITS' ) ) {
+	define( 'SUPPRESS_CREDITS', false );
+}
+
 // Information protocol of incoming request.
 if ( isset( $_SERVER['SERVER_PROTOCOL'] ) ) {
 	$server_protocol = $_SERVER['SERVER_PROTOCOL'];
