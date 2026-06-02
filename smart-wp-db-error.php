@@ -42,8 +42,12 @@ if ( defined( 'ABSPATH' ) ) {
 		unlink( $lock );
 	}
 
-	// If there is no (longer a) lock, create one; if successful, send the alert.
-	if ( ! file_exists( $lock ) && touch( $lock ) ) {
+	// Atomically create the lock. Mode 'x' fails if the file already exists, so
+	// of several concurrent requests only the one that wins the race sends the
+	// alert; the rest see the lock and stay quiet.
+	$lock_handle = @fopen( $lock, 'x' );
+	if ( false !== $lock_handle ) {
+		fclose( $lock_handle );
 		$touched = true;
 		$headers = 'From: ' . MAIL_FROM . "\n" .
 			'X-Mailer: PHP/' . PHP_VERSION . "\n" .
