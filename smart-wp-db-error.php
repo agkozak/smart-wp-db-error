@@ -3,9 +3,9 @@
  * Smart WP db-error.php
  *
  * @package Smart_WP_db_error_php
- * @version 1.0.6
+ * @version 1.1
  *
- * @copyright 2017-2024 Alexandros Kozak
+ * @copyright 2017-2026 Alexandros Kozak
  * @license GPLv2 (or later)
  */
 
@@ -14,6 +14,11 @@ if ( ! defined( 'MAIL_FROM' )
 	|| ! defined( 'MAIL_TO' )
 	|| ! defined( 'ALERT_INTERVAL' ) ) {
 	die();
+}
+
+// SUPPRESS_CREDITS is optional; default it so line 139 cannot fatal on PHP 8+.
+if ( ! defined( 'SUPPRESS_CREDITS' ) ) {
+	define( 'SUPPRESS_CREDITS', false );
 }
 
 // Information protocol of incoming request.
@@ -31,17 +36,22 @@ $lock    = __DIR__ . DIRECTORY_SEPARATOR . 'smart-wp-db-error.lock';
 // When db-error.php is accessed directly, only show the message; do not e-mail.
 if ( defined( 'ABSPATH' ) ) {
 
-	// If lock exists and is older than the alert interval, delete it.
-	if ( file_exists( $lock ) ) {
-		if ( time() - filectime( $lock ) > ALERT_INTERVAL ) {
-			unlink( $lock );
-		}
+	// If the lock exists but is older than the alert interval, delete it so
+	// that a fresh alert can be sent on this same request.
+	if ( file_exists( $lock ) && time() - filectime( $lock ) > ALERT_INTERVAL ) {
+		unlink( $lock );
+	}
 
-	// Otherwise try to create the lock; if successful, send the alert e-mail.
-	} elseif ( touch( $lock ) ) {
-		$touched = true;
-		$headers = 'From: ' . MAIL_FROM . "\n" .
-			'X-Mailer: PHP/' . PHP_VERSION . "\n" .
+	// Atomically create the lock. Mode 'x' fails if the file already exists, so
+	// of several concurrent requests only the one that wins the race sends the
+	// alert; the rest see the lock and stay quiet.
+	$lock_handle = @fopen( $lock, 'x' );
+	if ( false !== $lock_handle ) {
+		fclose( $lock_handle );
+		// RFC 5322 specifies CRLF between header lines. (If your host runs
+		// qmail, which doubles the CR, change these back to "\n".).
+		$headers = 'From: ' . MAIL_FROM . "\r\n" .
+			'X-Mailer: PHP/' . PHP_VERSION . "\r\n" .
 			'X-Priority: 1 (High)';
 
 		// Encrypted vs. non-encrypted connection.
@@ -53,18 +63,24 @@ if ( defined( 'ABSPATH' ) ) {
 
 		// Server name.
 		if ( isset( $_SERVER['SERVER_NAME'] ) ) {
-			$server_name = filter_var( stripslashes(
-				$_SERVER['SERVER_NAME']                       // Input var okay.
-			), FILTER_SANITIZE_URL );
+			$server_name = filter_var(
+				stripslashes(
+					$_SERVER['SERVER_NAME']                       // Input var okay.
+				),
+				FILTER_SANITIZE_URL
+			);
 		} else {
 			$server_name = '';
 		}
 
 		// Request URI.
 		if ( isset( $_SERVER['REQUEST_URI'] ) ) {
-			$request_uri = filter_var( stripslashes(
-				$_SERVER['REQUEST_URI']                   // Input var okay.
-			), FILTER_SANITIZE_URL );
+			$request_uri = filter_var(
+				stripslashes(
+					$_SERVER['REQUEST_URI']                   // Input var okay.
+				),
+				FILTER_SANITIZE_URL
+			);
 		} else {
 			$request_uri = '';
 		}
@@ -74,7 +90,13 @@ if ( defined( 'ABSPATH' ) ) {
 			'The database error occurred when someone tried to open this page: '
 			. $web_protocol . '://' . $server_name . $request_uri . "\n";
 		$subject = 'Database error at ' . $server_name;
-		mail( MAIL_TO, $subject, $message, $headers );
+		if ( mail( MAIL_TO, $subject, $message, $headers ) ) {
+			$touched = true;
+		} else {
+			// The send failed; drop the lock so the next request retries
+			// instead of suppressing alerts for the whole interval.
+			unlink( $lock );
+		}
 	}
 }
 ?>
