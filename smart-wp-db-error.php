@@ -48,9 +48,10 @@ if ( defined( 'ABSPATH' ) ) {
 	$lock_handle = @fopen( $lock, 'x' );
 	if ( false !== $lock_handle ) {
 		fclose( $lock_handle );
-		$touched = true;
-		$headers = 'From: ' . MAIL_FROM . "\n" .
-			'X-Mailer: PHP/' . PHP_VERSION . "\n" .
+		// RFC 5322 specifies CRLF between header lines. (If your host runs
+		// qmail, which doubles the CR, change these back to "\n".)
+		$headers = 'From: ' . MAIL_FROM . "\r\n" .
+			'X-Mailer: PHP/' . PHP_VERSION . "\r\n" .
 			'X-Priority: 1 (High)';
 
 		// Encrypted vs. non-encrypted connection.
@@ -83,7 +84,13 @@ if ( defined( 'ABSPATH' ) ) {
 			'The database error occurred when someone tried to open this page: '
 			. $web_protocol . '://' . $server_name . $request_uri . "\n";
 		$subject = 'Database error at ' . $server_name;
-		mail( MAIL_TO, $subject, $message, $headers );
+		if ( mail( MAIL_TO, $subject, $message, $headers ) ) {
+			$touched = true;
+		} else {
+			// The send failed; drop the lock so the next request retries
+			// instead of suppressing alerts for the whole interval.
+			unlink( $lock );
+		}
 	}
 }
 ?>
