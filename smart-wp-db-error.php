@@ -36,14 +36,14 @@ $lock    = __DIR__ . DIRECTORY_SEPARATOR . 'smart-wp-db-error.lock';
 // When db-error.php is accessed directly, only show the message; do not e-mail.
 if ( defined( 'ABSPATH' ) ) {
 
-	// If lock exists and is older than the alert interval, delete it.
-	if ( file_exists( $lock ) ) {
-		if ( time() - filectime( $lock ) > ALERT_INTERVAL ) {
-			unlink( $lock );
-		}
+	// If the lock exists but is older than the alert interval, delete it so
+	// that a fresh alert can be sent on this same request.
+	if ( file_exists( $lock ) && time() - filectime( $lock ) > ALERT_INTERVAL ) {
+		unlink( $lock );
+	}
 
-	// Otherwise try to create the lock; if successful, send the alert e-mail.
-	} elseif ( touch( $lock ) ) {
+	// If there is no (longer a) lock, create one; if successful, send the alert.
+	if ( ! file_exists( $lock ) && touch( $lock ) ) {
 		$touched = true;
 		$headers = 'From: ' . MAIL_FROM . "\n" .
 			'X-Mailer: PHP/' . PHP_VERSION . "\n" .
