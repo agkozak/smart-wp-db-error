@@ -49,7 +49,7 @@ if ( defined( 'ABSPATH' ) ) {
 	if ( false !== $lock_handle ) {
 		fclose( $lock_handle );
 		// RFC 5322 specifies CRLF between header lines. (If your host runs
-		// qmail, which doubles the CR, change these back to "\n".)
+		// qmail, which doubles the CR, change these back to "\n".).
 		$headers = 'From: ' . MAIL_FROM . "\r\n" .
 			'X-Mailer: PHP/' . PHP_VERSION . "\r\n" .
 			'X-Priority: 1 (High)';
@@ -63,18 +63,24 @@ if ( defined( 'ABSPATH' ) ) {
 
 		// Server name.
 		if ( isset( $_SERVER['SERVER_NAME'] ) ) {
-			$server_name = filter_var( stripslashes(
-				$_SERVER['SERVER_NAME']                       // Input var okay.
-			), FILTER_SANITIZE_URL );
+			$server_name = filter_var(
+				stripslashes(
+					$_SERVER['SERVER_NAME']                       // Input var okay.
+				),
+				FILTER_SANITIZE_URL
+			);
 		} else {
 			$server_name = '';
 		}
 
 		// Request URI.
 		if ( isset( $_SERVER['REQUEST_URI'] ) ) {
-			$request_uri = filter_var( stripslashes(
-				$_SERVER['REQUEST_URI']                   // Input var okay.
-			), FILTER_SANITIZE_URL );
+			$request_uri = filter_var(
+				stripslashes(
+					$_SERVER['REQUEST_URI']                   // Input var okay.
+				),
+				FILTER_SANITIZE_URL
+			);
 		} else {
 			$request_uri = '';
 		}
